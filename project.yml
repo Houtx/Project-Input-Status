@@ -1,0 +1,44 @@
+name: InputStatus
+options:
+  bundleIdPrefix: com.inputstatus
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    DEVELOPMENT_TEAM: ""
+targets:
+  InputStatus:
+    type: application
+    platform: macOS
+    sources:
+      - path: InputStatus/App
+      - path: InputStatus/Shared
+    resources:
+      - path: InputStatus/Resources/Assets.xcassets
+    entitlements: InputStatus/Resources/InputStatus.entitlements
+    info:
+      path: InputStatus/Resources/InputStatus-Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.inputstatus.desktop
+        INFOPLIST_KEY_LSUIElement: YES
+    dependencies:
+      - target: InputStatusWidgetExtension
+        embed: true
+  InputStatusWidgetExtension:
+    type: app-extension
+    platform: macOS
+    sources:
+      - path: InputStatus/Widget
+      - path: InputStatus/Shared
+    entitlements: InputStatus/Resources/InputStatusWidget.entitlements
+    info:
+      path: InputStatus/Resources/InputStatusWidget-Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.inputstatus.desktop.widget
+        SKIP_INSTALL: YES
+        APPLICATION_EXTENSION_API_ONLY: YES

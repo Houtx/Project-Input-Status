@@ -1,0 +1,154 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10000000000000000000001 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001 /* AppModel.swift */; };
+		A10000000000000000000002 /* InputStatusApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000002 /* InputStatusApp.swift */; };
+		A10000000000000000000003 /* StatusAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000003 /* StatusAPI.swift */; };
+		A10000000000000000000004 /* StatusModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000004 /* StatusModels.swift */; };
+		A10000000000000000000006 /* InputStatusWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000006 /* InputStatusWidget.swift */; };
+		A10000000000000000000007 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000007 /* Assets.xcassets */; };
+		A10000000000000000000008 /* InputStatusWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A20000000000000000000008 /* InputStatusWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A30000000000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A40000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A50000000000000000000002;
+			remoteInfo = InputStatusWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A60000000000000000000001 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A10000000000000000000008 /* InputStatusWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		A20000000000000000000001 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		A20000000000000000000002 /* InputStatusApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputStatusApp.swift; sourceTree = "<group>"; };
+		A20000000000000000000003 /* StatusAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusAPI.swift; sourceTree = "<group>"; };
+		A20000000000000000000004 /* StatusModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusModels.swift; sourceTree = "<group>"; };
+		A20000000000000000000006 /* InputStatusWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputStatusWidget.swift; sourceTree = "<group>"; };
+		A20000000000000000000007 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A20000000000000000000008 /* InputStatusWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = wrapper.app-extension; includeInIndex = 0; path = InputStatusWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		A20000000000000000000009 /* InputStatus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InputStatus.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A20000000000000000000010 /* InputStatus-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = InputStatus-Info.plist; sourceTree = "<group>"; };
+		A20000000000000000000011 /* InputStatusWidget-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = InputStatusWidget-Info.plist; sourceTree = "<group>"; };
+		A20000000000000000000012 /* InputStatus.entitlements */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.entitlements; path = InputStatus.entitlements; sourceTree = "<group>"; };
+		A20000000000000000000013 /* InputStatusWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.entitlements; path = InputStatusWidget.entitlements; sourceTree = "<group>"; };
+		A20000000000000000000014 /* project.yml */ = {isa = PBXFileReference; lastKnownFileType = text; path = project.yml; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A70000000000000000000001 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		A70000000000000000000002 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A80000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				A80000000000000000000007 /* InputStatus */,
+				A20000000000000000000014 /* project.yml */,
+				A80000000000000000000006 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A80000000000000000000007 /* InputStatus */ = {isa = PBXGroup; children = (A80000000000000000000002 /* App */, A80000000000000000000003 /* Shared */, A80000000000000000000004 /* Widget */, A80000000000000000000005 /* Resources */); path = InputStatus; sourceTree = "<group>"; };
+		A80000000000000000000002 /* App */ = {isa = PBXGroup; children = (A20000000000000000000001 /* AppModel.swift */, A20000000000000000000002 /* InputStatusApp.swift */); path = App; sourceTree = "<group>"; };
+		A80000000000000000000003 /* Shared */ = {isa = PBXGroup; children = (A20000000000000000000003 /* StatusAPI.swift */, A20000000000000000000004 /* StatusModels.swift */); path = Shared; sourceTree = "<group>"; };
+		A80000000000000000000004 /* Widget */ = {isa = PBXGroup; children = (A20000000000000000000006 /* InputStatusWidget.swift */); path = Widget; sourceTree = "<group>"; };
+		A80000000000000000000005 /* Resources */ = {isa = PBXGroup; children = (A20000000000000000000007 /* Assets.xcassets */, A20000000000000000000010 /* InputStatus-Info.plist */, A20000000000000000000011 /* InputStatusWidget-Info.plist */, A20000000000000000000012 /* InputStatus.entitlements */, A20000000000000000000013 /* InputStatusWidget.entitlements */); path = Resources; sourceTree = "<group>"; };
+		A80000000000000000000006 /* Products */ = {isa = PBXGroup; children = (A20000000000000000000009 /* InputStatus.app */, A20000000000000000000008 /* InputStatusWidgetExtension.appex */); name = Products; sourceTree = "<group>"; };
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A50000000000000000000001 /* InputStatus */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A90000000000000000000001 /* Build configuration list for PBXNativeTarget "InputStatus" */;
+			buildPhases = (A60000000000000000000002 /* Sources */, A70000000000000000000001 /* Frameworks */, A60000000000000000000003 /* Resources */, A60000000000000000000001 /* Embed Foundation Extensions */);
+			buildRules = ();
+			dependencies = (A30000000000000000000002 /* PBXTargetDependency */);
+			name = InputStatus;
+			productName = InputStatus;
+			productReference = A20000000000000000000009 /* InputStatus.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A50000000000000000000002 /* InputStatusWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A90000000000000000000002 /* Build configuration list for PBXNativeTarget "InputStatusWidgetExtension" */;
+			buildPhases = (A60000000000000000000004 /* Sources */, A70000000000000000000002 /* Frameworks */, A60000000000000000000005 /* Resources */);
+			buildRules = ();
+			dependencies = ();
+			name = InputStatusWidgetExtension;
+			productName = InputStatusWidgetExtension;
+			productReference = A20000000000000000000008 /* InputStatusWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A40000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = { LastUpgradeCheck = 1600; ORGANIZATIONNAME = "Personal"; };
+			buildConfigurationList = A90000000000000000000003 /* Build configuration list for PBXProject "InputStatus" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (en, Base, zh-Hans);
+			mainGroup = A80000000000000000000001;
+			productRefGroup = A80000000000000000000006 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (A50000000000000000000001 /* InputStatus */, A50000000000000000000002 /* InputStatusWidgetExtension */);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A60000000000000000000003 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A10000000000000000000007 /* Assets.xcassets in Resources */); runOnlyForDeploymentPostprocessing = 0; };
+		A60000000000000000000005 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A60000000000000000000002 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A10000000000000000000001 /* AppModel.swift in Sources */, A10000000000000000000002 /* InputStatusApp.swift in Sources */, A10000000000000000000003 /* StatusAPI.swift in Sources */, A10000000000000000000004 /* StatusModels.swift in Sources */); runOnlyForDeploymentPostprocessing = 0; };
+		A60000000000000000000004 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A10000000000000000000006 /* InputStatusWidget.swift in Sources */, A10000000000000000000003 /* StatusAPI.swift in Sources */, A10000000000000000000004 /* StatusModels.swift in Sources */); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A30000000000000000000002 /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = A50000000000000000000002 /* InputStatusWidgetExtension */; targetProxy = A30000000000000000000001 /* PBXContainerItemProxy */; };
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		AA0000000000000000000001 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; CODE_SIGN_STYLE = Automatic; DEVELOPMENT_TEAM = ""; MACOSX_DEPLOYMENT_TARGET = 14.0; SDKROOT = macosx; SWIFT_VERSION = 5.0; }; name = Debug; };
+		AA0000000000000000000002 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; CODE_SIGN_STYLE = Automatic; DEVELOPMENT_TEAM = ""; MACOSX_DEPLOYMENT_TARGET = 14.0; SDKROOT = macosx; SWIFT_VERSION = 5.0; }; name = Release; };
+		AA0000000000000000000003 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; CODE_SIGN_ENTITLEMENTS = InputStatus/Resources/InputStatus.entitlements; INFOPLIST_FILE = InputStatus/Resources/InputStatus-Info.plist; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks"); PRODUCT_BUNDLE_IDENTIFIER = com.inputstatus.desktop; PRODUCT_NAME = "$(TARGET_NAME)"; }; name = Debug; };
+		AA0000000000000000000004 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; CODE_SIGN_ENTITLEMENTS = InputStatus/Resources/InputStatus.entitlements; INFOPLIST_FILE = InputStatus/Resources/InputStatus-Info.plist; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks"); PRODUCT_BUNDLE_IDENTIFIER = com.inputstatus.desktop; PRODUCT_NAME = "$(TARGET_NAME)"; }; name = Release; };
+		AA0000000000000000000005 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {APPLICATION_EXTENSION_API_ONLY = YES; CODE_SIGN_ENTITLEMENTS = InputStatus/Resources/InputStatusWidget.entitlements; INFOPLIST_FILE = InputStatus/Resources/InputStatusWidget-Info.plist; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks"); PRODUCT_BUNDLE_IDENTIFIER = com.inputstatus.desktop.widget; PRODUCT_NAME = "$(TARGET_NAME)"; SKIP_INSTALL = YES; }; name = Debug; };
+		AA0000000000000000000006 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {APPLICATION_EXTENSION_API_ONLY = YES; CODE_SIGN_ENTITLEMENTS = InputStatus/Resources/InputStatusWidget.entitlements; INFOPLIST_FILE = InputStatus/Resources/InputStatusWidget-Info.plist; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks"); PRODUCT_BUNDLE_IDENTIFIER = com.inputstatus.desktop.widget; PRODUCT_NAME = "$(TARGET_NAME)"; SKIP_INSTALL = YES; }; name = Release; };
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A90000000000000000000001 /* Build configuration list for PBXNativeTarget "InputStatus" */ = {isa = XCConfigurationList; buildConfigurations = (AA0000000000000000000003 /* Debug */, AA0000000000000000000004 /* Release */); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		A90000000000000000000002 /* Build configuration list for PBXNativeTarget "InputStatusWidgetExtension" */ = {isa = XCConfigurationList; buildConfigurations = (AA0000000000000000000005 /* Debug */, AA0000000000000000000006 /* Release */); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		A90000000000000000000003 /* Build configuration list for PBXProject "InputStatus" */ = {isa = XCConfigurationList; buildConfigurations = (AA0000000000000000000001 /* Debug */, AA0000000000000000000002 /* Release */); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+/* End XCConfigurationList section */
+	};
+	rootObject = A40000000000000000000001 /* Project object */;
+}
