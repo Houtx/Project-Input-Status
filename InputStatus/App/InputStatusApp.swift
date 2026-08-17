@@ -5,7 +5,7 @@ import ServiceManagement
 import SwiftUI
 
 @MainActor
-final class InputStatusAppDelegate: NSObject, NSApplicationDelegate, @MainActor SPUStandardUserDriverDelegate {
+final class InputStatusAppDelegate: NSObject, NSApplicationDelegate, SPUStandardUserDriverDelegate {
     let model = AppModel()
     lazy var updaterController = SPUStandardUpdaterController(
         startingUpdater: true,
@@ -37,18 +37,30 @@ final class InputStatusAppDelegate: NSObject, NSApplicationDelegate, @MainActor 
         desktopWidgetController?.toggle()
     }
 
-    func standardUserDriverWillHandleShowingUpdate(
+    nonisolated func standardUserDriverWillHandleShowingUpdate(
         _ handleShowingUpdate: Bool,
         forUpdate update: SUAppcastItem,
         state: SPUUserUpdateState
     ) {
         guard handleShowingUpdate else { return }
+        Task { @MainActor [weak self] in
+            self?.beginPresentingUpdate()
+        }
+    }
+
+    nonisolated func standardUserDriverWillFinishUpdateSession() {
+        Task { @MainActor [weak self] in
+            self?.finishPresentingUpdate()
+        }
+    }
+
+    private func beginPresentingUpdate() {
         updaterIsPresenting = true
         NSApp.setActivationPolicy(.regular)
         NSApp.activate()
     }
 
-    func standardUserDriverWillFinishUpdateSession() {
+    private func finishPresentingUpdate() {
         guard updaterIsPresenting else { return }
         updaterIsPresenting = false
         NSApp.setActivationPolicy(.accessory)
