@@ -19,7 +19,7 @@ final class AppModel: ObservableObject {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            Task { @MainActor in self?.refreshNow() }
+            Task { @MainActor [weak self] in self?.refreshNow() }
         }
         startRefreshing()
     }

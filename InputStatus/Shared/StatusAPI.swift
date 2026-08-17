@@ -3,6 +3,7 @@ import Foundation
 enum StatusAPIError: LocalizedError, Sendable {
     case badResponse(Int)
     case malformedResponse
+    case responseTooLarge
 
     var errorDescription: String? {
         switch self {
@@ -10,6 +11,8 @@ enum StatusAPIError: LocalizedError, Sendable {
             return "服务器返回 HTTP \(code)"
         case .malformedResponse:
             return "状态数据格式无法识别"
+        case .responseTooLarge:
+            return "状态数据超过预期大小"
         }
     }
 }
@@ -30,9 +33,13 @@ struct StatusAPI: Sendable {
         guard (200..<300).contains(httpResponse.statusCode) else {
             throw StatusAPIError.badResponse(httpResponse.statusCode)
         }
+        guard data.count <= InputStatusConstants.maximumResponseBytes else {
+            throw StatusAPIError.responseTooLarge
+        }
 
         do {
-            return try JSONDecoder().decode(StatusSnapshot.self, from: data)
+            let snapshot = try JSONDecoder().decode(StatusSnapshot.self, from: data)
+            return try snapshot.validated()
         } catch {
             throw StatusAPIError.malformedResponse
         }
@@ -44,7 +51,18 @@ enum StatusStore {
 
     static func load() -> CachedStatus? {
         guard let data = UserDefaults.standard.data(forKey: key) else { return nil }
-        return try? JSONDecoder().decode(CachedStatus.self, from: data)
+        guard var cachedStatus = try? JSONDecoder().decode(CachedStatus.self, from: data) else {
+            UserDefaults.standard.removeObject(forKey: key)
+            return nil
+        }
+        if let snapshot = cachedStatus.snapshot {
+            guard let validatedSnapshot = try? snapshot.validated() else {
+                UserDefaults.standard.removeObject(forKey: key)
+                return nil
+            }
+            cachedStatus.snapshot = validatedSnapshot
+        }
+        return cachedStatus
     }
 
     static func save(_ cachedStatus: CachedStatus) throws {
@@ -57,10 +75,11 @@ enum StatusRefresher {
     static func refresh() async throws -> CachedStatus {
         do {
             let snapshot = try await StatusAPI().fetch()
+            let now = Date()
             let result = CachedStatus(
                 snapshot: snapshot,
-                fetchedAt: Date(),
-                lastAttemptAt: Date(),
+                fetchedAt: min(now, snapshot.generatedAt),
+                lastAttemptAt: now,
                 lastError: nil
             )
             try StatusStore.save(result)

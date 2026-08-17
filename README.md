@@ -99,6 +99,14 @@ cd Project-Input-Status
 构建产物位于 `build/InputStatus.app`。
 首次构建会下载固定版本的 Sparkle 2，校验 SHA-256 后缓存到 `build/dependencies/`。
 
+运行核心数据测试和脚本/配置检查：
+
+```zsh
+./scripts/test.sh
+```
+
+测试和正式构建都只使用 Command Line Tools，不要求安装完整 Xcode。GitHub Pull Request 也会自动运行同样的测试并构建 Universal 2 应用。
+
 生成 Universal 2 DMG 发行包：
 
 ```zsh

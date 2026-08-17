@@ -45,18 +45,14 @@ codesign --verify --deep --strict --verbose=2 "$installed_bundle"
 "$launch_services" -f "$installed_bundle"
 pluginkit -a "$installed_extension"
 pluginkit -e use -i com.inputstatus.desktop.widget >/dev/null 2>&1 || true
-mkdir -p "$HOME/Library/LaunchAgents"
 launchctl bootout "$launch_domain" "$launch_agent" >/dev/null 2>&1 || true
-plutil -create xml1 "$launch_agent"
-plutil -insert Label -string com.inputstatus.desktop "$launch_agent"
-plutil -insert ProgramArguments -json \
-    "[\"/usr/bin/open\",\"-g\",\"$installed_bundle\"]" \
-    "$launch_agent"
-plutil -insert RunAtLoad -bool true "$launch_agent"
-launchctl bootstrap "$launch_domain" "$launch_agent"
+if [[ -f "$launch_agent" ]]; then
+    rm -f "$launch_agent"
+fi
 killall chronod >/dev/null 2>&1 || true
 killall NotificationCenter >/dev/null 2>&1 || true
 killall WidgetConfigurationExtension >/dev/null 2>&1 || true
+/usr/bin/open -g "$installed_bundle"
 
 print "Installed: $installed_bundle"
-print "The desktop widget starts automatically and will reopen after login."
+print "The desktop widget is running and will reopen after login."
