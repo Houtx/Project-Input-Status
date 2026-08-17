@@ -84,7 +84,7 @@ jobs:
               "$archive_root"
 
           xmllint --noout "$appcast_file"
-          rg -q 'sparkle:edSignature=' "$appcast_file"
+          grep -q 'sparkle:edSignature=' "$appcast_file"
           gh release upload "$TAG_NAME" "$appcast_file" \
             --repo "$REPOSITORY" \
             --clobber
