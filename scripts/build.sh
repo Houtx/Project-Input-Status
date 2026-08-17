@@ -47,7 +47,13 @@ if [[ "$module_cache_root" != "$project_root/build/ModuleCache" ]]; then
     exit 1
 fi
 
-rm -rf "$app_bundle" "$arch_build_root" "$module_cache_root"
+cleanup_intermediates() {
+    rm -rf "$arch_build_root" "$module_cache_root"
+}
+trap cleanup_intermediates EXIT
+
+rm -rf "$app_bundle"
+cleanup_intermediates
 mkdir -p \
     "$app_bundle/Contents/MacOS" \
     "$app_bundle/Contents/Frameworks" \
@@ -160,7 +166,5 @@ codesign \
     "$app_bundle"
 
 codesign --verify --deep --strict --verbose=2 "$app_bundle"
-
-rm -rf "$arch_build_root" "$module_cache_root"
 
 print "Built: $app_bundle"
