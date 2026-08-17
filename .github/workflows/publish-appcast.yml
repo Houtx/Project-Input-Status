@@ -3,6 +3,12 @@ name: Publish Sparkle Appcast
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: Release tag to update
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -10,16 +16,16 @@ permissions:
 jobs:
   publish-appcast:
     name: Sign and upload appcast
-    if: ${{ !github.event.release.prerelease }}
+    if: ${{ github.event_name == 'workflow_dispatch' || !github.event.release.prerelease }}
     runs-on: macos-14
     env:
       GH_TOKEN: ${{ github.token }}
       REPOSITORY: ${{ github.repository }}
       SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
-      TAG_NAME: ${{ github.event.release.tag_name }}
+      TAG_NAME: ${{ github.event.release.tag_name || inputs.tag_name }}
     steps:
       - name: Generate signed appcast
-        shell: zsh
+        shell: /bin/zsh {0}
         run: |
           set -euo pipefail
 
@@ -61,7 +67,10 @@ jobs:
           tar -xf "$work_root/$sparkle_archive" -C "$sparkle_root"
 
           notes_file="$archive_root/${dmg_file:t:r}.md"
-          jq -r '.release.body // "Input Status update."' "$GITHUB_EVENT_PATH" > "$notes_file"
+          gh release view "$TAG_NAME" \
+            --repo "$REPOSITORY" \
+            --json body \
+            --jq '.body // "Input Status update."' > "$notes_file"
 
           print -rn -- "$SPARKLE_PRIVATE_KEY" | \
             "$sparkle_root/bin/generate_appcast" \
