@@ -16,7 +16,7 @@ release_notes=${1:-"$project_root/release-notes/v$version.md"}
 sparkle_account="com.inputstatus.desktop"
 download_prefix="https://github.com/Houtx/Project-Input-Status/releases/download/v$version/"
 
-for required_tool in ditto plutil rg xmllint; do
+for required_tool in ditto grep plutil xmllint; do
     if ! command -v "$required_tool" >/dev/null 2>&1; then
         print -u2 "Missing required tool: $required_tool"
         exit 1
@@ -61,11 +61,11 @@ fi
     "$appcast_staging"
 
 xmllint --noout "$appcast_file"
-if ! rg -q 'sparkle:edSignature=' "$appcast_file"; then
+if ! grep -q 'sparkle:edSignature=' "$appcast_file"; then
     print -u2 "Generated appcast does not contain an Ed25519 signature."
     exit 1
 fi
-if ! rg -q "$download_prefix$dmg_name" "$appcast_file"; then
+if ! grep -Fq "$download_prefix$dmg_name" "$appcast_file"; then
     print -u2 "Generated appcast does not reference the expected GitHub release asset."
     exit 1
 fi
