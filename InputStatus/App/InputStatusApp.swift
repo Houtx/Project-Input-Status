@@ -1,11 +1,17 @@
 import AppKit
 import Combine
 import ServiceManagement
+@preconcurrency import Sparkle
 import SwiftUI
 
 @MainActor
-final class InputStatusAppDelegate: NSObject, NSApplicationDelegate {
+final class InputStatusAppDelegate: NSObject, NSApplicationDelegate, @MainActor SPUStandardUserDriverDelegate {
     let model = AppModel()
+    lazy var updaterController = SPUStandardUpdaterController(
+        startingUpdater: true,
+        updaterDelegate: nil,
+        userDriverDelegate: self
+    )
     private var desktopWidgetController: DesktopWidgetWindowController?
 
     var isDesktopWidgetVisible: Bool {
@@ -13,6 +19,7 @@ final class InputStatusAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        _ = updaterController
         registerLoginItemIfNeeded()
         desktopWidgetController = DesktopWidgetWindowController(model: model)
         desktopWidgetController?.show()
@@ -27,6 +34,23 @@ final class InputStatusAppDelegate: NSObject, NSApplicationDelegate {
 
     func toggleDesktopWidget() {
         desktopWidgetController?.toggle()
+    }
+
+    var supportsGentleScheduledUpdateReminders: Bool {
+        true
+    }
+
+    func standardUserDriverWillHandleShowingUpdate(
+        _ handleShowingUpdate: Bool,
+        forUpdate update: SUAppcastItem,
+        state: SPUUserUpdateState
+    ) {
+        NSApp.setActivationPolicy(.regular)
+        NSApp.activate()
+    }
+
+    func standardUserDriverWillFinishUpdateSession() {
+        NSApp.setActivationPolicy(.accessory)
     }
 
     private func registerLoginItemIfNeeded() {
@@ -86,6 +110,13 @@ private struct StatusMenuView: View {
                 appDelegate.toggleDesktopWidget()
             } label: {
                 Label("显示/隐藏桌面挂件", systemImage: "rectangle.on.rectangle")
+            }
+
+            Divider()
+            Button {
+                appDelegate.updaterController.checkForUpdates(nil)
+            } label: {
+                Label("检查更新…", systemImage: "arrow.triangle.2.circlepath")
             }
 
             Divider()

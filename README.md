@@ -14,6 +14,8 @@
 - 约每两分钟自动刷新，右上角按钮可立即刷新。
 - 菜单栏同步显示状态，并可显示或隐藏桌面挂件。
 - 网络异常时保留最近一次成功数据，超过约四分钟会标记为过期。
+- 每小时自动检查 GitHub Release，在后台下载并安全安装签名更新。
+- 菜单栏提供“检查更新…”，可随时手动检查。
 - 从“应用程序”首次启动后，自动请求注册为登录项。
 - 保留 WidgetKit 扩展，可在系统允许时添加原生小组件。
 
@@ -41,6 +43,8 @@ DMG 是 Universal 2 版本，同时支持 Apple Silicon 和 Intel Mac，不需�
 
 此确认通常只需操作一次。
 
+从 `1.5.0` 开始，后续正式版本可在应用内自动更新，无需重复下载 DMG。
+
 ### 从源码安装（开发者）
 
 此方式需要 macOS Command Line Tools，但不需要完整 Xcode。如果尚未安装，可运行 `xcode-select --install`。
@@ -65,7 +69,10 @@ cd Project-Input-Status
 - 点击刷新图标立即请求最新状态。
 - 点击“打开状态页”查看完整状态页。
 - 点击菜单栏状态图标，可显示或隐藏桌面挂件。
+- 点击菜单栏中的“检查更新…”立即检查 GitHub 最新版本。
 - 挂件解锁后可以拖动，位置会在下次启动时恢复。
+
+更新由 [Sparkle](https://sparkle-project.org/) 完成。应用每小时检查一次，默认后台下载；如果应用长时间未退出，会提示重启以完成安装。
 
 ## WidgetKit 说明
 
@@ -77,7 +84,8 @@ cd Project-Input-Status
 
 - 不需要登录或填写 API Key。
 - 不包含遥测、广告或用户追踪。
-- 仅向 `https://status.input.im/api/status` 请求公开状态数据。
+- 向 `https://status.input.im/api/status` 请求公开状态数据。
+- 向 GitHub Releases 请求签名更新源，有新版本时下载 DMG。
 - 状态缓存和挂件偏好仅保存在本机应用沙箱中。
 
 ## 开发
@@ -89,6 +97,7 @@ cd Project-Input-Status
 ```
 
 构建产物位于 `build/InputStatus.app`。
+首次构建会下载固定版本的 Sparkle 2，校验 SHA-256 后缓存到 `build/dependencies/`。
 
 生成 Universal 2 DMG 发行包：
 
@@ -97,7 +106,9 @@ brew install create-dmg
 ./scripts/create-dmg.sh
 ```
 
-DMG 和 SHA-256 校验文件位于 `dist/`。
+DMG、SHA-256 校验文件和已签名的 `appcast.xml` 位于 `dist/`。版本更新说明位于 `release-notes/`。
+
+Sparkle 更新签名私钥保存在本机钥匙串的 `com.inputstatus.desktop` 账户中，公开仓库只包含公钥。GitHub 仓库配置加密 Secret `SPARKLE_PRIVATE_KEY` 后，每次发布正式 Release 都会自动签名并上传 `appcast.xml`。
 
 重新生成应用图标：
 
@@ -111,7 +122,7 @@ DMG 和 SHA-256 校验文件位于 `dist/`。
 - `InputStatus/Widget`：WidgetKit 扩展。
 - `InputStatus/Shared`：状态 API、数据模型和本地缓存。
 - `InputStatus/Resources`：图标、Info.plist 和沙箱权限。
-- `scripts`：无 Xcode 的构建、安装和卸载脚本。
+- `scripts`：无 Xcode 的构建、安装、更新源生成和卸载脚本。
 - `InputStatus.xcodeproj`、`project.yml`：可选的 Xcode/XcodeGen 工程描述。
 
 ## 卸载
@@ -124,4 +135,4 @@ DMG 和 SHA-256 校验文件位于 `dist/`。
 
 ## 签名说明
 
-当前 DMG 和默认构建采用 ad-hoc 签名，未经 Apple 公证，因此首次打开需要按上方步骤在“隐私与安全性”中确认。这不会要求用户安装开发工具。
+当前 DMG 和默认构建采用 ad-hoc 签名，未经 Apple 公证，因此首次打开需要按上方步骤在“隐私与安全性”中确认。后续应用内更新还会使用独立的 Ed25519 签名验证完整性和来源。这不会要求用户安装开发工具。

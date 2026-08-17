@@ -14,6 +14,7 @@
 		A10000000000000000000006 /* InputStatusWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000006 /* InputStatusWidget.swift */; };
 		A10000000000000000000007 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000007 /* Assets.xcassets */; };
 		A10000000000000000000008 /* InputStatusWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A20000000000000000000008 /* InputStatusWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A10000000000000000000009 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = AB0000000000000000000001 /* Sparkle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,7 +58,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		A70000000000000000000001 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		A70000000000000000000001 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (A10000000000000000000009 /* Sparkle in Frameworks */); runOnlyForDeploymentPostprocessing = 0; };
 		A70000000000000000000002 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXFrameworksBuildPhase section */
 
@@ -87,6 +88,7 @@
 			buildRules = ();
 			dependencies = (A30000000000000000000002 /* PBXTargetDependency */);
 			name = InputStatus;
+			packageProductDependencies = (AB0000000000000000000001 /* Sparkle */);
 			productName = InputStatus;
 			productReference = A20000000000000000000009 /* InputStatus.app */;
 			productType = "com.apple.product-type.application";
@@ -114,6 +116,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (en, Base, zh-Hans);
 			mainGroup = A80000000000000000000001;
+			packageReferences = (AC0000000000000000000001 /* XCRemoteSwiftPackageReference "Sparkle" */);
 			productRefGroup = A80000000000000000000006 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -149,6 +152,25 @@
 		A90000000000000000000002 /* Build configuration list for PBXNativeTarget "InputStatusWidgetExtension" */ = {isa = XCConfigurationList; buildConfigurations = (AA0000000000000000000005 /* Debug */, AA0000000000000000000006 /* Release */); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
 		A90000000000000000000003 /* Build configuration list for PBXProject "InputStatus" */ = {isa = XCConfigurationList; buildConfigurations = (AA0000000000000000000001 /* Debug */, AA0000000000000000000002 /* Release */); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AC0000000000000000000001 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = exactVersion;
+				version = 2.9.6;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AB0000000000000000000001 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AC0000000000000000000001 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A40000000000000000000001 /* Project object */;
 }

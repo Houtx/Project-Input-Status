@@ -14,6 +14,7 @@ version=$(plutil -extract CFBundleShortVersionString raw \
     "$project_root/InputStatus/Resources/InputStatus-Info.plist")
 dmg_file="$dist_root/InputStatus-$version-universal.dmg"
 checksum_file="$dmg_file.sha256"
+appcast_file="$dist_root/appcast.xml"
 
 for required_tool in create-dmg ditto hdiutil plutil shasum swift; do
     if ! command -v "$required_tool" >/dev/null 2>&1; then
@@ -64,6 +65,8 @@ hdiutil verify "$dmg_file"
     cd "$dist_root"
     shasum -a 256 "${dmg_file:t}" > "${checksum_file:t}"
 )
+"$script_dir/create-appcast.sh"
 
 print "Created: $dmg_file"
 print "Checksum: $checksum_file"
+print "Appcast: $appcast_file"

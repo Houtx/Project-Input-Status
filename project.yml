@@ -9,6 +9,10 @@ settings:
     SWIFT_VERSION: "5.0"
     MACOSX_DEPLOYMENT_TARGET: "14.0"
     DEVELOPMENT_TEAM: ""
+packages:
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    exactVersion: 2.9.6
 targets:
   InputStatus:
     type: application
@@ -28,6 +32,7 @@ targets:
     dependencies:
       - target: InputStatusWidgetExtension
         embed: true
+      - package: Sparkle
   InputStatusWidgetExtension:
     type: app-extension
     platform: macOS

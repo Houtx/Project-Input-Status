@@ -12,6 +12,9 @@ extension_executable="$extension_bundle/Contents/MacOS/InputStatusWidgetExtensio
 icon_file="$project_root/InputStatus/Resources/AppIcon.icns"
 arch_build_root="$build_root/Architectures"
 module_cache_root="$build_root/ModuleCache"
+sparkle_root=$("$script_dir/bootstrap-sparkle.sh")
+sparkle_framework="$sparkle_root/Sparkle.framework"
+sparkle_license="$sparkle_root/LICENSE"
 sdk_path=$(xcrun --sdk macosx --show-sdk-path)
 sdk_version=$(xcrun --sdk macosx --show-sdk-version)
 sdk_build=$(xcrun --sdk macosx --show-sdk-build-version)
@@ -19,7 +22,7 @@ os_build=$(sw_vers -buildVersion)
 deployment_target="14.0"
 target_arches=(arm64 x86_64)
 
-for required_tool in swiftc codesign lipo plutil xcrun; do
+for required_tool in swiftc codesign ditto lipo plutil xcrun; do
     if ! command -v "$required_tool" >/dev/null 2>&1; then
         print -u2 "Missing required tool: $required_tool"
         exit 1
@@ -42,6 +45,7 @@ fi
 rm -rf "$app_bundle" "$arch_build_root"
 mkdir -p \
     "$app_bundle/Contents/MacOS" \
+    "$app_bundle/Contents/Frameworks" \
     "$app_bundle/Contents/Resources" \
     "$extension_bundle/Contents/MacOS" \
     "$extension_bundle/Contents/Resources" \
@@ -73,6 +77,10 @@ for target_arch in "${target_arches[@]}"; do
     CLANG_MODULE_CACHE_PATH="$module_cache" \
     swiftc \
         "${common_flags[@]}" \
+        -F "$sparkle_root" \
+        -framework Sparkle \
+        -Xlinker -rpath \
+        -Xlinker @executable_path/../Frameworks \
         -module-name InputStatus \
         -o "$arch_app_executable" \
         "${shared_sources[@]}" \
@@ -110,6 +118,8 @@ cp \
     "$extension_bundle/Contents/Info.plist"
 cp "$icon_file" "$app_bundle/Contents/Resources/AppIcon.icns"
 cp "$icon_file" "$extension_bundle/Contents/Resources/AppIcon.icns"
+cp "$sparkle_license" "$app_bundle/Contents/Resources/Sparkle-LICENSE.txt"
+ditto "$sparkle_framework" "$app_bundle/Contents/Frameworks/Sparkle.framework"
 
 for info_plist in \
     "$app_bundle/Contents/Info.plist" \

@@ -25,7 +25,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.4.0</string>
+	<string>1.5.0</string>
 	<key>CFBundleSupportedPlatforms</key>
 	<array>
 		<string>MacOSX</string>
@@ -42,10 +42,24 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>5</string>
+	<string>6</string>
 	<key>LSUIElement</key>
 	<true/>
 	<key>LSMinimumSystemVersion</key>
 	<string>14.0</string>
+	<key>SUAutomaticallyUpdate</key>
+	<true/>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUEnableInstallerLauncherService</key>
+	<true/>
+	<key>SUFeedURL</key>
+	<string>https://github.com/Houtx/Project-Input-Status/releases/latest/download/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>tqbea21dd1/OZBfDE0/Dx57n4IE08cLec0DHSHihWiQ=</string>
+	<key>SUScheduledCheckInterval</key>
+	<real>3600</real>
+	<key>SUScheduledImpatientCheckInterval</key>
+	<real>7200</real>
 </dict>
 </plist>

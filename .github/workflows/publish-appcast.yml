@@ -1,0 +1,81 @@
+name: Publish Sparkle Appcast
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  publish-appcast:
+    name: Sign and upload appcast
+    if: ${{ !github.event.release.prerelease }}
+    runs-on: macos-14
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPOSITORY: ${{ github.repository }}
+      SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+      TAG_NAME: ${{ github.event.release.tag_name }}
+    steps:
+      - name: Generate signed appcast
+        shell: zsh
+        run: |
+          set -euo pipefail
+
+          if [[ -z "$SPARKLE_PRIVATE_KEY" ]]; then
+            print -u2 "SPARKLE_PRIVATE_KEY is not configured."
+            exit 1
+          fi
+
+          sparkle_version="2.9.6"
+          sparkle_sha256="52bf9e88cdd972fc0c81501377a880e90d47031bd8ca5462488f843e2609e192"
+          sparkle_archive="Sparkle-$sparkle_version.tar.xz"
+          work_root=$(mktemp -d)
+          archive_root="$work_root/archive"
+          sparkle_root="$work_root/sparkle"
+          appcast_file="$work_root/appcast.xml"
+          trap 'rm -rf "$work_root"' EXIT
+          mkdir -p "$archive_root" "$sparkle_root"
+
+          gh release download "$TAG_NAME" \
+            --repo "$REPOSITORY" \
+            --pattern 'InputStatus-*-universal.dmg' \
+            --dir "$archive_root"
+
+          dmg_files=("$archive_root"/InputStatus-*-universal.dmg(N))
+          if (( ${#dmg_files[@]} != 1 )); then
+            print -u2 "Expected exactly one Universal DMG release asset."
+            exit 1
+          fi
+          dmg_file=${dmg_files[1]}
+
+          curl --fail --location --show-error \
+            --output "$work_root/$sparkle_archive" \
+            "https://github.com/sparkle-project/Sparkle/releases/download/$sparkle_version/$sparkle_archive"
+          actual_sha256=$(shasum -a 256 "$work_root/$sparkle_archive" | awk '{print $1}')
+          if [[ "$actual_sha256" != "$sparkle_sha256" ]]; then
+            print -u2 "Sparkle checksum verification failed."
+            exit 1
+          fi
+          tar -xf "$work_root/$sparkle_archive" -C "$sparkle_root"
+
+          notes_file="$archive_root/${dmg_file:t:r}.md"
+          jq -r '.release.body // "Input Status update."' "$GITHUB_EVENT_PATH" > "$notes_file"
+
+          print -rn -- "$SPARKLE_PRIVATE_KEY" | \
+            "$sparkle_root/bin/generate_appcast" \
+              --ed-key-file - \
+              --download-url-prefix "https://github.com/$REPOSITORY/releases/download/$TAG_NAME/" \
+              --embed-release-notes \
+              --link "https://github.com/$REPOSITORY" \
+              --maximum-versions 1 \
+              --maximum-deltas 0 \
+              -o "$appcast_file" \
+              "$archive_root"
+
+          xmllint --noout "$appcast_file"
+          rg -q 'sparkle:edSignature=' "$appcast_file"
+          gh release upload "$TAG_NAME" "$appcast_file" \
+            --repo "$REPOSITORY" \
+            --clobber
