@@ -1,5 +1,6 @@
 import AppKit
 import Combine
+import ServiceManagement
 import SwiftUI
 
 @MainActor
@@ -12,6 +13,7 @@ final class InputStatusAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        registerLoginItemIfNeeded()
         desktopWidgetController = DesktopWidgetWindowController(model: model)
         desktopWidgetController?.show()
     }
@@ -25,6 +27,17 @@ final class InputStatusAppDelegate: NSObject, NSApplicationDelegate {
 
     func toggleDesktopWidget() {
         desktopWidgetController?.toggle()
+    }
+
+    private func registerLoginItemIfNeeded() {
+        guard Bundle.main.bundleURL.path.hasPrefix("/Applications/") else { return }
+        guard SMAppService.mainApp.status == .notRegistered else { return }
+
+        do {
+            try SMAppService.mainApp.register()
+        } catch {
+            NSLog("Unable to register Input Status as a login item: %@", error.localizedDescription)
+        }
     }
 }
 

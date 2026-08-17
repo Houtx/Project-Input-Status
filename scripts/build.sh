@@ -10,23 +10,16 @@ extension_bundle="$app_bundle/Contents/PlugIns/InputStatusWidgetExtension.appex"
 app_executable="$app_bundle/Contents/MacOS/InputStatus"
 extension_executable="$extension_bundle/Contents/MacOS/InputStatusWidgetExtension"
 icon_file="$project_root/InputStatus/Resources/AppIcon.icns"
-module_cache="$build_root/ModuleCache"
+arch_build_root="$build_root/Architectures"
+module_cache_root="$build_root/ModuleCache"
 sdk_path=$(xcrun --sdk macosx --show-sdk-path)
 sdk_version=$(xcrun --sdk macosx --show-sdk-version)
 sdk_build=$(xcrun --sdk macosx --show-sdk-build-version)
 os_build=$(sw_vers -buildVersion)
-target_arch=$(uname -m)
 deployment_target="14.0"
+target_arches=(arm64 x86_64)
 
-case "$target_arch" in
-    arm64|x86_64) ;;
-    *)
-        print -u2 "Unsupported architecture: $target_arch"
-        exit 1
-        ;;
-esac
-
-for required_tool in swiftc codesign plutil xcrun; do
+for required_tool in swiftc codesign lipo plutil xcrun; do
     if ! command -v "$required_tool" >/dev/null 2>&1; then
         print -u2 "Missing required tool: $required_tool"
         exit 1
@@ -41,48 +34,73 @@ if [[ "$app_bundle" != "$project_root/build/InputStatus.app" ]]; then
     print -u2 "Refusing to clean an unexpected build path: $app_bundle"
     exit 1
 fi
+if [[ "$arch_build_root" != "$project_root/build/Architectures" ]]; then
+    print -u2 "Refusing to clean an unexpected architecture path: $arch_build_root"
+    exit 1
+fi
 
-rm -rf "$app_bundle"
+rm -rf "$app_bundle" "$arch_build_root"
 mkdir -p \
     "$app_bundle/Contents/MacOS" \
     "$app_bundle/Contents/Resources" \
     "$extension_bundle/Contents/MacOS" \
     "$extension_bundle/Contents/Resources" \
-    "$module_cache"
+    "$arch_build_root" \
+    "$module_cache_root"
 
 shared_sources=("$project_root"/InputStatus/Shared/*.swift)
 app_sources=("$project_root"/InputStatus/App/*.swift)
 widget_sources=("$project_root"/InputStatus/Widget/*.swift)
 
-common_flags=(
-    -O
-    -warnings-as-errors
-    -swift-version 5
-    -target "$target_arch-apple-macosx$deployment_target"
-    -sdk "$sdk_path"
-    -Xlinker -dead_strip
-)
+for target_arch in "${target_arches[@]}"; do
+    arch_root="$arch_build_root/$target_arch"
+    module_cache="$module_cache_root/$target_arch"
+    arch_app_executable="$arch_root/InputStatus"
+    arch_extension_executable="$arch_root/InputStatusWidgetExtension"
+    mkdir -p "$arch_root" "$module_cache"
 
-print "Building InputStatus.app"
-SWIFT_MODULECACHE_PATH="$module_cache" \
-CLANG_MODULE_CACHE_PATH="$module_cache" \
-swiftc \
-    "${common_flags[@]}" \
-    -module-name InputStatus \
-    -o "$app_executable" \
-    "${shared_sources[@]}" \
-    "${app_sources[@]}"
+    common_flags=(
+        -O
+        -warnings-as-errors
+        -swift-version 5
+        -target "$target_arch-apple-macosx$deployment_target"
+        -sdk "$sdk_path"
+        -Xlinker -dead_strip
+    )
 
-print "Building InputStatusWidgetExtension.appex"
-SWIFT_MODULECACHE_PATH="$module_cache" \
-CLANG_MODULE_CACHE_PATH="$module_cache" \
-swiftc \
-    "${common_flags[@]}" \
-    -application-extension \
-    -module-name InputStatusWidgetExtension \
-    -o "$extension_executable" \
-    "${shared_sources[@]}" \
-    "${widget_sources[@]}"
+    print "Building InputStatus.app ($target_arch)"
+    SWIFT_MODULECACHE_PATH="$module_cache" \
+    CLANG_MODULE_CACHE_PATH="$module_cache" \
+    swiftc \
+        "${common_flags[@]}" \
+        -module-name InputStatus \
+        -o "$arch_app_executable" \
+        "${shared_sources[@]}" \
+        "${app_sources[@]}"
+
+    print "Building InputStatusWidgetExtension.appex ($target_arch)"
+    SWIFT_MODULECACHE_PATH="$module_cache" \
+    CLANG_MODULE_CACHE_PATH="$module_cache" \
+    swiftc \
+        "${common_flags[@]}" \
+        -application-extension \
+        -module-name InputStatusWidgetExtension \
+        -o "$arch_extension_executable" \
+        "${shared_sources[@]}" \
+        "${widget_sources[@]}"
+done
+
+print "Creating Universal 2 executables"
+lipo -create \
+    "$arch_build_root/arm64/InputStatus" \
+    "$arch_build_root/x86_64/InputStatus" \
+    -output "$app_executable"
+lipo -create \
+    "$arch_build_root/arm64/InputStatusWidgetExtension" \
+    "$arch_build_root/x86_64/InputStatusWidgetExtension" \
+    -output "$extension_executable"
+lipo "$app_executable" -verify_arch arm64 x86_64
+lipo "$extension_executable" -verify_arch arm64 x86_64
 
 cp \
     "$project_root/InputStatus/Resources/InputStatus-Info.plist" \

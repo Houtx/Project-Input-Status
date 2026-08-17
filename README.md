@@ -4,7 +4,7 @@
 
 # Input Status
 
-一个轻量的 macOS 桌面挂件，用于查看 [AI.INPUT.IM](https://status.input.im/) 的服务可用状态。它提供原生玻璃界面、菜单栏入口、约两分钟自动刷新和手动刷新，不需要安装完整 Xcode，也不需要 Apple Developer 账号。
+一个轻量的 macOS 桌面挂件，用于查看 [AI.INPUT.IM](https://status.input.im/) 的服务可用状态。它提供原生玻璃界面、菜单栏入口、约两分钟自动刷新和手动刷新。普通用户可直接通过 DMG 安装，不需要 Xcode、Command Line Tools 或 Apple Developer 账号。
 
 ## 功能
 
@@ -14,24 +14,36 @@
 - 约每两分钟自动刷新，右上角按钮可立即刷新。
 - 菜单栏同步显示状态，并可显示或隐藏桌面挂件。
 - 网络异常时保留最近一次成功数据，超过约四分钟会标记为过期。
-- 安装后自动配置用户级登录启动。
+- 从“应用程序”首次启动后，自动请求注册为登录项。
 - 保留 WidgetKit 扩展，可在系统允许时添加原生小组件。
 
 ## 系统要求
 
 - macOS 14 Sonoma 或更高版本。
 - Apple Silicon 或 Intel Mac。
-- macOS Command Line Tools。
-
-如果尚未安装 Command Line Tools，可运行：
-
-```zsh
-xcode-select --install
-```
-
-这不会安装完整 Xcode。
 
 ## 安装
+
+### DMG 安装（推荐）
+
+1. 从 [GitHub Releases](https://github.com/Houtx/Project-Input-Status/releases/latest) 下载最新的 `InputStatus-*-universal.dmg`。
+2. 打开 DMG，将 `InputStatus` 拖入“应用程序”。
+3. 在“应用程序”中打开 `InputStatus`。
+
+DMG 是 Universal 2 版本，同时支持 Apple Silicon 和 Intel Mac，不需要安装任何开发工具。
+
+由于当前发行版本未使用 Apple Developer ID 公证，macOS 首次打开时可能提示无法验证开发者。这时请：
+
+1. 关闭该提示。
+2. 打开“系统设置 → 隐私与安全性”。
+3. 在安全性区域找到 InputStatus，点击“仍要打开”。
+4. 在再次出现的确认框中点击“打开”。
+
+此确认通常只需操作一次。
+
+### 从源码安装（开发者）
+
+此方式需要 macOS Command Line Tools，但不需要完整 Xcode。如果尚未安装，可运行 `xcode-select --install`。
 
 ```zsh
 git clone https://github.com/Houtx/Project-Input-Status.git
@@ -39,7 +51,7 @@ cd Project-Input-Status
 ./scripts/install.sh
 ```
 
-安装脚本会：
+源码安装脚本会：
 
 1. 使用当前系统 SDK 编译主程序和 Widget 扩展。
 2. 使用 ad-hoc 签名生成本机可运行的应用。
@@ -78,6 +90,15 @@ cd Project-Input-Status
 
 构建产物位于 `build/InputStatus.app`。
 
+生成 Universal 2 DMG 发行包：
+
+```zsh
+brew install create-dmg
+./scripts/create-dmg.sh
+```
+
+DMG 和 SHA-256 校验文件位于 `dist/`。
+
 重新生成应用图标：
 
 ```zsh
@@ -103,4 +124,4 @@ cd Project-Input-Status
 
 ## 签名说明
 
-默认构建采用 ad-hoc 签名，仅用于当前 Mac 本地安装。面向其他用户分发时，应改用 Apple Developer ID 签名并完成公证。
+当前 DMG 和默认构建采用 ad-hoc 签名，未经 Apple 公证，因此首次打开需要按上方步骤在“隐私与安全性”中确认。这不会要求用户安装开发工具。
