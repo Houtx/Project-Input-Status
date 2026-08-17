@@ -16,8 +16,6 @@
 	<array>
 		<string>AppIcon</string>
 	</array>
-	<key>CFBundleIconName</key>
-	<string>AppIcon</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>

@@ -15,6 +15,8 @@
 		A10000000000000000000007 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000007 /* Assets.xcassets */; };
 		A10000000000000000000008 /* InputStatusWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A20000000000000000000008 /* InputStatusWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A10000000000000000000009 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = AB0000000000000000000001 /* Sparkle */; };
+		A10000000000000000000010 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000015 /* AppIcon.icns */; };
+		A10000000000000000000011 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000015 /* AppIcon.icns */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +57,7 @@
 		A20000000000000000000012 /* InputStatus.entitlements */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.entitlements; path = InputStatus.entitlements; sourceTree = "<group>"; };
 		A20000000000000000000013 /* InputStatusWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.entitlements; path = InputStatusWidget.entitlements; sourceTree = "<group>"; };
 		A20000000000000000000014 /* project.yml */ = {isa = PBXFileReference; lastKnownFileType = text; path = project.yml; sourceTree = "<group>"; };
+		A20000000000000000000015 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,7 +79,7 @@
 		A80000000000000000000002 /* App */ = {isa = PBXGroup; children = (A20000000000000000000001 /* AppModel.swift */, A20000000000000000000002 /* InputStatusApp.swift */); path = App; sourceTree = "<group>"; };
 		A80000000000000000000003 /* Shared */ = {isa = PBXGroup; children = (A20000000000000000000003 /* StatusAPI.swift */, A20000000000000000000004 /* StatusModels.swift */); path = Shared; sourceTree = "<group>"; };
 		A80000000000000000000004 /* Widget */ = {isa = PBXGroup; children = (A20000000000000000000006 /* InputStatusWidget.swift */); path = Widget; sourceTree = "<group>"; };
-		A80000000000000000000005 /* Resources */ = {isa = PBXGroup; children = (A20000000000000000000007 /* Assets.xcassets */, A20000000000000000000010 /* InputStatus-Info.plist */, A20000000000000000000011 /* InputStatusWidget-Info.plist */, A20000000000000000000012 /* InputStatus.entitlements */, A20000000000000000000013 /* InputStatusWidget.entitlements */); path = Resources; sourceTree = "<group>"; };
+		A80000000000000000000005 /* Resources */ = {isa = PBXGroup; children = (A20000000000000000000007 /* Assets.xcassets */, A20000000000000000000015 /* AppIcon.icns */, A20000000000000000000010 /* InputStatus-Info.plist */, A20000000000000000000011 /* InputStatusWidget-Info.plist */, A20000000000000000000012 /* InputStatus.entitlements */, A20000000000000000000013 /* InputStatusWidget.entitlements */); path = Resources; sourceTree = "<group>"; };
 		A80000000000000000000006 /* Products */ = {isa = PBXGroup; children = (A20000000000000000000009 /* InputStatus.app */, A20000000000000000000008 /* InputStatusWidgetExtension.appex */); name = Products; sourceTree = "<group>"; };
 /* End PBXGroup section */
 
@@ -125,8 +128,8 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		A60000000000000000000003 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A10000000000000000000007 /* Assets.xcassets in Resources */); runOnlyForDeploymentPostprocessing = 0; };
-		A60000000000000000000005 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		A60000000000000000000003 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A10000000000000000000007 /* Assets.xcassets in Resources */, A10000000000000000000010 /* AppIcon.icns in Resources */); runOnlyForDeploymentPostprocessing = 0; };
+		A60000000000000000000005 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A10000000000000000000011 /* AppIcon.icns in Resources */); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -141,8 +144,8 @@
 /* Begin XCBuildConfiguration section */
 		AA0000000000000000000001 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; CODE_SIGN_STYLE = Automatic; DEVELOPMENT_TEAM = ""; MACOSX_DEPLOYMENT_TARGET = 14.0; SDKROOT = macosx; SWIFT_VERSION = 5.0; }; name = Debug; };
 		AA0000000000000000000002 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; CODE_SIGN_STYLE = Automatic; DEVELOPMENT_TEAM = ""; MACOSX_DEPLOYMENT_TARGET = 14.0; SDKROOT = macosx; SWIFT_VERSION = 5.0; }; name = Release; };
-		AA0000000000000000000003 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; CODE_SIGN_ENTITLEMENTS = InputStatus/Resources/InputStatus.entitlements; INFOPLIST_FILE = InputStatus/Resources/InputStatus-Info.plist; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks"); PRODUCT_BUNDLE_IDENTIFIER = com.inputstatus.desktop; PRODUCT_NAME = "$(TARGET_NAME)"; }; name = Debug; };
-		AA0000000000000000000004 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; CODE_SIGN_ENTITLEMENTS = InputStatus/Resources/InputStatus.entitlements; INFOPLIST_FILE = InputStatus/Resources/InputStatus-Info.plist; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks"); PRODUCT_BUNDLE_IDENTIFIER = com.inputstatus.desktop; PRODUCT_NAME = "$(TARGET_NAME)"; }; name = Release; };
+		AA0000000000000000000003 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGN_ENTITLEMENTS = InputStatus/Resources/InputStatus.entitlements; INFOPLIST_FILE = InputStatus/Resources/InputStatus-Info.plist; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks"); PRODUCT_BUNDLE_IDENTIFIER = com.inputstatus.desktop; PRODUCT_NAME = "$(TARGET_NAME)"; }; name = Debug; };
+		AA0000000000000000000004 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGN_ENTITLEMENTS = InputStatus/Resources/InputStatus.entitlements; INFOPLIST_FILE = InputStatus/Resources/InputStatus-Info.plist; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks"); PRODUCT_BUNDLE_IDENTIFIER = com.inputstatus.desktop; PRODUCT_NAME = "$(TARGET_NAME)"; }; name = Release; };
 		AA0000000000000000000005 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {APPLICATION_EXTENSION_API_ONLY = YES; CODE_SIGN_ENTITLEMENTS = InputStatus/Resources/InputStatusWidget.entitlements; INFOPLIST_FILE = InputStatus/Resources/InputStatusWidget-Info.plist; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks"); PRODUCT_BUNDLE_IDENTIFIER = com.inputstatus.desktop.widget; PRODUCT_NAME = "$(TARGET_NAME)"; SKIP_INSTALL = YES; }; name = Debug; };
 		AA0000000000000000000006 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {APPLICATION_EXTENSION_API_ONLY = YES; CODE_SIGN_ENTITLEMENTS = InputStatus/Resources/InputStatusWidget.entitlements; INFOPLIST_FILE = InputStatus/Resources/InputStatusWidget-Info.plist; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks"); PRODUCT_BUNDLE_IDENTIFIER = com.inputstatus.desktop.widget; PRODUCT_NAME = "$(TARGET_NAME)"; SKIP_INSTALL = YES; }; name = Release; };
 /* End XCBuildConfiguration section */

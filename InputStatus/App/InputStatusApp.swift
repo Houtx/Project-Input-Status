@@ -13,6 +13,7 @@ final class InputStatusAppDelegate: NSObject, NSApplicationDelegate, @MainActor 
         userDriverDelegate: self
     )
     private var desktopWidgetController: DesktopWidgetWindowController?
+    private var updaterIsPresenting = false
 
     var isDesktopWidgetVisible: Bool {
         desktopWidgetController?.isVisible == true
@@ -36,20 +37,20 @@ final class InputStatusAppDelegate: NSObject, NSApplicationDelegate, @MainActor 
         desktopWidgetController?.toggle()
     }
 
-    var supportsGentleScheduledUpdateReminders: Bool {
-        true
-    }
-
     func standardUserDriverWillHandleShowingUpdate(
         _ handleShowingUpdate: Bool,
         forUpdate update: SUAppcastItem,
         state: SPUUserUpdateState
     ) {
+        guard handleShowingUpdate else { return }
+        updaterIsPresenting = true
         NSApp.setActivationPolicy(.regular)
         NSApp.activate()
     }
 
     func standardUserDriverWillFinishUpdateSession() {
+        guard updaterIsPresenting else { return }
+        updaterIsPresenting = false
         NSApp.setActivationPolicy(.accessory)
     }
 
@@ -241,12 +242,28 @@ private final class DesktopWidgetWindowController: NSObject {
     private let settings = DesktopWidgetSettings()
     private var window: NSPanel?
     private var hostingController: NSHostingController<DesktopWidgetView>?
+    private var screenParametersObserver: NSObjectProtocol?
 
     init(model: AppModel) {
         self.model = model
         super.init()
         settings.onLockChanged = { [weak self] isLocked in
             self?.applyLockState(isLocked)
+        }
+        screenParametersObserver = NotificationCenter.default.addObserver(
+            forName: NSApplication.didChangeScreenParametersNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.ensureWindowIsVisible()
+            }
+        }
+    }
+
+    deinit {
+        if let screenParametersObserver {
+            NotificationCenter.default.removeObserver(screenParametersObserver)
         }
     }
 
@@ -258,6 +275,7 @@ private final class DesktopWidgetWindowController: NSObject {
         if window == nil {
             makeWindow()
         }
+        ensureWindowIsVisible()
         window?.orderFrontRegardless()
     }
 
@@ -287,6 +305,7 @@ private final class DesktopWidgetWindowController: NSObject {
         panel.backgroundColor = .clear
         panel.hasShadow = true
         panel.hidesOnDeactivate = false
+        panel.isMovable = !settings.isLocked
         panel.isMovableByWindowBackground = !settings.isLocked
         let desktopWidgetLevel = Int(CGWindowLevelForKey(.desktopIconWindow)) + 1
         panel.level = NSWindow.Level(rawValue: desktopWidgetLevel)
@@ -306,10 +325,33 @@ private final class DesktopWidgetWindowController: NSObject {
         }
 
         window = panel
+        ensureWindowIsVisible()
     }
 
     private func applyLockState(_ isLocked: Bool) {
+        window?.isMovable = !isLocked
         window?.isMovableByWindowBackground = !isLocked
+    }
+
+    private func ensureWindowIsVisible() {
+        guard let window else { return }
+        let screens = NSScreen.screens
+        guard let screen = screens.first(where: { $0.visibleFrame.intersects(window.frame) })
+            ?? NSScreen.main
+            ?? screens.first else {
+            return
+        }
+
+        let visibleFrame = screen.visibleFrame
+        let maximumX = max(visibleFrame.minX, visibleFrame.maxX - window.frame.width)
+        let maximumY = max(visibleFrame.minY, visibleFrame.maxY - window.frame.height)
+        let origin = NSPoint(
+            x: min(max(window.frame.minX, visibleFrame.minX), maximumX),
+            y: min(max(window.frame.minY, visibleFrame.minY), maximumY)
+        )
+        if origin != window.frame.origin {
+            window.setFrameOrigin(origin)
+        }
     }
 }
 
@@ -497,6 +539,7 @@ private struct DesktopWidgetView: View {
 private struct DesktopGlassModifier: ViewModifier {
     @ViewBuilder
     func body(content: Content) -> some View {
+#if compiler(>=6.2)
         if #available(macOS 26.0, *) {
             content
                 .glassEffect(.regular, in: .rect(cornerRadius: 18))
@@ -507,5 +550,12 @@ private struct DesktopGlassModifier: ViewModifier {
                     in: RoundedRectangle(cornerRadius: 18, style: .continuous)
                 )
         }
+#else
+        content
+            .background(
+                .ultraThinMaterial,
+                in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+            )
+#endif
     }
 }

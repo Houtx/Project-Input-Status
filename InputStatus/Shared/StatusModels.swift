@@ -6,7 +6,19 @@ enum InputStatusConstants {
     static let refreshURL = URL(string: "inputstatus://refresh")!
     static let widgetKind = "InputStatusWidget"
     static let historyLength = 60
+    static let maximumServiceCount = 32
+    static let maximumResponseBytes = 1_048_576
+    static let maximumFutureClockSkew: TimeInterval = 300
+    static let minimumGeneratedTimestamp: TimeInterval = 1_577_836_800
     static let refreshInterval: TimeInterval = 120
+}
+
+enum StatusSnapshotValidationError: Error, Equatable {
+    case invalidGeneratedAt
+    case invalidServiceCount
+    case invalidService(String)
+    case duplicateService(String)
+    case inconsistentSummary
 }
 
 struct ProbeResult: Codable, Equatable, Sendable {
@@ -36,6 +48,14 @@ struct ProbeResult: Codable, Equatable, Sendable {
         self.isOK = isOK
         self.latencyMS = latencyMS
         self.error = error
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(timestamp.timeIntervalSince1970, forKey: .timestamp)
+        try container.encode(isOK, forKey: .isOK)
+        try container.encodeIfPresent(latencyMS, forKey: .latencyMS)
+        try container.encodeIfPresent(error, forKey: .error)
     }
 }
 
@@ -102,6 +122,74 @@ struct StatusSnapshot: Codable, Equatable, Sendable {
         self.generatedAt = generatedAt
         self.services = services
     }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(allOK, forKey: .allOK)
+        try container.encode(generatedAt.timeIntervalSince1970, forKey: .generatedAt)
+        try container.encode(services, forKey: .services)
+    }
+
+    func validated(referenceDate: Date = Date()) throws -> StatusSnapshot {
+        let generatedTimestamp = generatedAt.timeIntervalSince1970
+        guard generatedTimestamp.isFinite,
+              generatedTimestamp >= InputStatusConstants.minimumGeneratedTimestamp,
+              generatedAt <= referenceDate.addingTimeInterval(
+                  InputStatusConstants.maximumFutureClockSkew
+              ) else {
+            throw StatusSnapshotValidationError.invalidGeneratedAt
+        }
+        guard !services.isEmpty,
+              services.count <= InputStatusConstants.maximumServiceCount else {
+            throw StatusSnapshotValidationError.invalidServiceCount
+        }
+
+        var seenModels = Set<String>()
+        let normalizedServices = try services.map { service in
+            let model = service.model.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !model.isEmpty,
+                  service.uptimePercent.isFinite,
+                  (0...100).contains(service.uptimePercent) else {
+                throw StatusSnapshotValidationError.invalidService(service.model)
+            }
+
+            let modelKey = model.lowercased()
+            guard seenModels.insert(modelKey).inserted else {
+                throw StatusSnapshotValidationError.duplicateService(model)
+            }
+
+            let probes = service.history + [service.last].compactMap { $0 }
+            guard probes.allSatisfy({ probe in
+                probe.timestamp.timeIntervalSince1970.isFinite
+                    && probe.timestamp.timeIntervalSince1970 > 0
+                    && (probe.latencyMS.map { $0 >= 0 } ?? true)
+            }) else {
+                throw StatusSnapshotValidationError.invalidService(model)
+            }
+
+            let history = Array(
+                service.history
+                    .sorted { $0.timestamp < $1.timestamp }
+                    .suffix(InputStatusConstants.historyLength)
+            )
+            return StatusService(
+                model: model,
+                uptimePercent: service.uptimePercent,
+                last: service.last,
+                history: history
+            )
+        }
+
+        guard allOK == normalizedServices.allSatisfy(\.isOnline) else {
+            throw StatusSnapshotValidationError.inconsistentSummary
+        }
+
+        return StatusSnapshot(
+            allOK: allOK,
+            generatedAt: generatedAt,
+            services: normalizedServices
+        )
+    }
 }
 
 struct CachedStatus: Codable, Equatable, Sendable {
@@ -122,13 +210,21 @@ struct CachedStatus: Codable, Equatable, Sendable {
         self.lastError = lastError
     }
 
-    var age: TimeInterval? {
+    func age(at date: Date) -> TimeInterval? {
         guard let fetchedAt else { return nil }
-        return max(0, Date().timeIntervalSince(fetchedAt))
+        return max(0, date.timeIntervalSince(fetchedAt))
+    }
+
+    var age: TimeInterval? {
+        age(at: Date())
+    }
+
+    func isStale(at date: Date) -> Bool {
+        guard let age = age(at: date) else { return true }
+        return age > InputStatusConstants.refreshInterval * 2
     }
 
     var isStale: Bool {
-        guard let age else { return true }
-        return age > InputStatusConstants.refreshInterval * 2
+        isStale(at: Date())
     }
 }

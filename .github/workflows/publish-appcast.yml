@@ -57,6 +57,9 @@ jobs:
           dmg_file=${dmg_files[1]}
 
           curl --fail --location --show-error \
+            --retry 3 \
+            --retry-all-errors \
+            --retry-delay 2 \
             --output "$work_root/$sparkle_archive" \
             "https://github.com/sparkle-project/Sparkle/releases/download/$sparkle_version/$sparkle_archive"
           actual_sha256=$(shasum -a 256 "$work_root/$sparkle_archive" | awk '{print $1}')
@@ -85,6 +88,9 @@ jobs:
 
           xmllint --noout "$appcast_file"
           grep -q 'sparkle:edSignature=' "$appcast_file"
+          grep -Fq \
+            "https://github.com/$REPOSITORY/releases/download/$TAG_NAME/${dmg_file:t}" \
+            "$appcast_file"
           gh release upload "$TAG_NAME" "$appcast_file" \
             --repo "$REPOSITORY" \
             --clobber

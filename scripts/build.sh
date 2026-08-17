@@ -12,13 +12,6 @@ extension_executable="$extension_bundle/Contents/MacOS/InputStatusWidgetExtensio
 icon_file="$project_root/InputStatus/Resources/AppIcon.icns"
 arch_build_root="$build_root/Architectures"
 module_cache_root="$build_root/ModuleCache"
-sparkle_root=$("$script_dir/bootstrap-sparkle.sh")
-sparkle_framework="$sparkle_root/Sparkle.framework"
-sparkle_license="$sparkle_root/LICENSE"
-sdk_path=$(xcrun --sdk macosx --show-sdk-path)
-sdk_version=$(xcrun --sdk macosx --show-sdk-version)
-sdk_build=$(xcrun --sdk macosx --show-sdk-build-version)
-os_build=$(sw_vers -buildVersion)
 deployment_target="14.0"
 target_arches=(arm64 x86_64)
 
@@ -28,6 +21,14 @@ for required_tool in swiftc codesign ditto lipo plutil xcrun; do
         exit 1
     fi
 done
+
+sparkle_root=$("$script_dir/bootstrap-sparkle.sh")
+sparkle_framework="$sparkle_root/Sparkle.framework"
+sparkle_license="$sparkle_root/LICENSE"
+sdk_path=$(xcrun --sdk macosx --show-sdk-path)
+sdk_version=$(xcrun --sdk macosx --show-sdk-version)
+sdk_build=$(xcrun --sdk macosx --show-sdk-build-version)
+os_build=$(sw_vers -buildVersion)
 
 if [[ ! -f "$icon_file" ]]; then
     "$script_dir/generate-icon.sh"
@@ -41,8 +42,12 @@ if [[ "$arch_build_root" != "$project_root/build/Architectures" ]]; then
     print -u2 "Refusing to clean an unexpected architecture path: $arch_build_root"
     exit 1
 fi
+if [[ "$module_cache_root" != "$project_root/build/ModuleCache" ]]; then
+    print -u2 "Refusing to clean an unexpected module cache path: $module_cache_root"
+    exit 1
+fi
 
-rm -rf "$app_bundle" "$arch_build_root"
+rm -rf "$app_bundle" "$arch_build_root" "$module_cache_root"
 mkdir -p \
     "$app_bundle/Contents/MacOS" \
     "$app_bundle/Contents/Frameworks" \
@@ -155,5 +160,7 @@ codesign \
     "$app_bundle"
 
 codesign --verify --deep --strict --verbose=2 "$app_bundle"
+
+rm -rf "$arch_build_root" "$module_cache_root"
 
 print "Built: $app_bundle"
