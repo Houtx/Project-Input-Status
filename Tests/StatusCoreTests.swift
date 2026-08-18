@@ -103,6 +103,61 @@ private struct StatusCoreTests {
             _ = try inconsistent.validated(referenceDate: now)
         }
 
+        let offlineProbe = ProbeResult(timestamp: now, isOK: false)
+        let previouslyOffline = StatusService(
+            model: "Legacy-Service",
+            uptimePercent: 98,
+            last: offlineProbe,
+            history: [offlineProbe]
+        )
+        let previousStatus = StatusSnapshot(
+            allOK: false,
+            generatedAt: now,
+            services: [service, previouslyOffline]
+        )
+        let currentStatus = StatusSnapshot(
+            allOK: false,
+            generatedAt: now.addingTimeInterval(60),
+            services: [
+                StatusService(
+                    model: "gpt-test",
+                    uptimePercent: 99,
+                    last: offlineProbe,
+                    history: [offlineProbe]
+                ),
+                StatusService(
+                    model: "legacy-service",
+                    uptimePercent: 99,
+                    last: history.last,
+                    history: history
+                ),
+                StatusService(
+                    model: "new-service",
+                    uptimePercent: 0,
+                    last: offlineProbe,
+                    history: [offlineProbe]
+                )
+            ]
+        )
+        let statusChange = try {
+            guard let change = StatusChange(from: previousStatus, to: currentStatus) else {
+                throw TestFailure.expectation("Status transitions must be detected")
+            }
+            return change
+        }()
+        try expect(
+            statusChange.newlyOffline == ["gpt-test", "new-service"],
+            "Offline and newly introduced failing services must be reported"
+        )
+        try expect(
+            statusChange.recovered == ["legacy-service"],
+            "Recovered services must be matched case-insensitively"
+        )
+        try expect(
+            StatusChange(from: currentStatus, to: currentStatus) == nil,
+            "Unchanged snapshots must not create notifications"
+        )
+
         let legacyEpoch = StatusSnapshot(
             allOK: true,
             generatedAt: Date(timeIntervalSince1970: 800_000_000),

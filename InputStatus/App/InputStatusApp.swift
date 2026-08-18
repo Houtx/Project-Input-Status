@@ -3,9 +3,11 @@ import Combine
 import ServiceManagement
 @preconcurrency import Sparkle
 import SwiftUI
+import UserNotifications
 
 @MainActor
-final class InputStatusAppDelegate: NSObject, NSApplicationDelegate, SPUStandardUserDriverDelegate {
+final class InputStatusAppDelegate: NSObject, NSApplicationDelegate,
+    SPUStandardUserDriverDelegate, UNUserNotificationCenterDelegate {
     let model = AppModel()
     lazy var updaterController = SPUStandardUpdaterController(
         startingUpdater: true,
@@ -21,6 +23,7 @@ final class InputStatusAppDelegate: NSObject, NSApplicationDelegate, SPUStandard
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         _ = updaterController
+        UNUserNotificationCenter.current().delegate = self
         registerLoginItemIfNeeded()
         desktopWidgetController = DesktopWidgetWindowController(model: model)
         desktopWidgetController?.show()
@@ -35,6 +38,14 @@ final class InputStatusAppDelegate: NSObject, NSApplicationDelegate, SPUStandard
 
     func toggleDesktopWidget() {
         desktopWidgetController?.toggle()
+    }
+
+    nonisolated func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification,
+        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+    ) {
+        completionHandler([.banner, .sound])
     }
 
     nonisolated func standardUserDriverWillHandleShowingUpdate(
@@ -125,6 +136,27 @@ private struct StatusMenuView: View {
                 Label("显示/隐藏桌面挂件", systemImage: "rectangle.on.rectangle")
             }
 
+            Toggle(
+                isOn: Binding(
+                    get: { model.statusNotificationsEnabled },
+                    set: { model.setStatusNotificationsEnabled($0) }
+                )
+            ) {
+                Label(
+                    "状态变化通知",
+                    systemImage: model.statusNotificationsEnabled ? "bell.fill" : "bell"
+                )
+            }
+            .toggleStyle(.switch)
+
+            if model.notificationPermissionDenied {
+                Button {
+                    openNotificationSettings()
+                } label: {
+                    Label("打开通知设置…", systemImage: "gearshape")
+                }
+            }
+
             Divider()
             Button {
                 appDelegate.updaterController.checkForUpdates(nil)
@@ -205,11 +237,8 @@ private struct StatusMenuView: View {
 
                     Spacer()
 
-                    Text(service.uptimePercent, format: .number.precision(.fractionLength(1)))
+                    Text(serviceMetrics(service))
                         .font(.system(.caption, design: .monospaced))
-                        .foregroundStyle(.secondary)
-                    Text("%")
-                        .font(.caption)
                         .foregroundStyle(.secondary)
                 }
                 .padding(.vertical, 6)
@@ -245,6 +274,13 @@ private struct StatusMenuView: View {
             .buttonStyle(.borderless)
             .help("退出")
         }
+    }
+
+    private func openNotificationSettings() {
+        guard let url = URL(
+            string: "x-apple.systempreferences:com.apple.Notifications-Settings.extension"
+        ) else { return }
+        NSWorkspace.shared.open(url)
     }
 }
 
@@ -515,11 +551,8 @@ private struct DesktopWidgetView: View {
 
                     Spacer(minLength: 6)
 
-                    Text(service.uptimePercent, format: .number.precision(.fractionLength(1)))
+                    Text(serviceMetrics(service))
                         .font(.system(.caption2, design: .monospaced))
-                        .foregroundStyle(.secondary)
-                    Text("%")
-                        .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
                 .frame(height: 23)
@@ -546,6 +579,24 @@ private struct DesktopWidgetView: View {
         .font(.caption2)
         .foregroundStyle(.secondary)
     }
+}
+
+private func serviceMetrics(_ service: StatusService) -> String {
+    let uptime = service.uptimePercent.formatted(
+        .number.precision(.fractionLength(1))
+    )
+    guard let latencyMS = service.last?.latencyMS else { return "\(uptime)%" }
+
+    let latency: String
+    if latencyMS < 1_000 {
+        latency = "\(latencyMS)ms"
+    } else {
+        let seconds = (Double(latencyMS) / 1_000).formatted(
+            .number.precision(.fractionLength(1))
+        )
+        latency = "\(seconds)s"
+    }
+    return "\(uptime)% · \(latency)"
 }
 
 private struct DesktopGlassModifier: ViewModifier {
