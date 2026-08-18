@@ -192,6 +192,36 @@ struct StatusSnapshot: Codable, Equatable, Sendable {
     }
 }
 
+struct StatusChange: Equatable, Sendable {
+    let newlyOffline: [String]
+    let recovered: [String]
+
+    init?(from previous: StatusSnapshot, to current: StatusSnapshot) {
+        let previousStates = Dictionary(
+            uniqueKeysWithValues: previous.services.map {
+                ($0.model.lowercased(), $0.isOnline)
+            }
+        )
+
+        newlyOffline = current.services.compactMap { service in
+            guard !service.isOnline,
+                  previousStates[service.model.lowercased()] != false else {
+                return nil
+            }
+            return service.model
+        }
+        recovered = current.services.compactMap { service in
+            guard service.isOnline,
+                  previousStates[service.model.lowercased()] == false else {
+                return nil
+            }
+            return service.model
+        }
+
+        guard !newlyOffline.isEmpty || !recovered.isEmpty else { return nil }
+    }
+}
+
 struct CachedStatus: Codable, Equatable, Sendable {
     var snapshot: StatusSnapshot?
     var fetchedAt: Date?
